@@ -1,14 +1,15 @@
+from unittest import TestCase
+
+from gap_finder.coordinate import Coordinate
 from gap_finder.generation import (
-    get_triangle_square_from_three_cords,
-    Coordinate,
-    is_dot_in_triangle,
     generate_plane_by_three_coordinates,
     build_surface,
     PLOT,
-    AXES
+    AXES,
 )
-
-from unittest import TestCase
+from gap_finder.utils import (
+    get_triangle_square_from_three_cords, is_dot_in_triangle
+)
 
 
 class GapFinderTestCase(TestCase):
@@ -39,11 +40,13 @@ class GapFinderTestCase(TestCase):
         x, y, z = generate_plane_by_three_coordinates(*self.cords)
         build_surface(AXES, x, y, z)
 
-        self.assertEqual(z[0][0], 1)
-        self.assertEqual(z[0][1], 2)
-        self.assertEqual(z[2][0], 2)
+        # TODO: описать в документации
+        # z[y coordinate ][ x coordinate]
+        self.assertEqual(z[0][0], self.cord1.z)
+        self.assertEqual(z[1][0], self.cord2.z)
+        self.assertEqual(z[0][2], self.cord3.z)
         PLOT.show()
 
 
 if __name__ == '__main__':
-    GapFinderTestCase().run()
+    GapFinderTestCase()

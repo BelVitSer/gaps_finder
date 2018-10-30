@@ -2,10 +2,9 @@ from itertools import combinations
 
 import numpy as np
 
-from gap_finder.utils import (find_equation_plane_rates,
-                              get_triangle_square_from_three_cords)
-from gap_finder.graphics import build_surface, build_main_surface, init_graphic
 from gap_finder.coordinate import Coordinate
+from gap_finder.graphics import build_surface, build_main_surface, init_graphic
+from gap_finder.utils import find_equation_plane_rates, is_dot_in_triangle
 
 # config
 GENERATION_TRIES = 100
@@ -99,34 +98,6 @@ def generate_plane_by_three_coordinates(coord_1: Coordinate, coord_2: Coordinate
     ZZ = f(XX, YY)
 
     return XX, YY, ZZ
-
-
-# TODO enum
-def is_dot_in_triangle(cords: list, cords_to_check: tuple) -> bool:
-    """
-    Очень простой способ проверить находится ли точка в треугольнике или нет.
-
-    Проверяется сумма площадей трех треугольников, на которые точка.
-
-    :param cords: (tuple(cord, cord, cord)): три точки
-    :param cords_to_check:
-    :return: (bool) нах
-    """
-
-    A_cord, B_cords, C_cords = cords
-    ABC = get_triangle_square_from_three_cords(A_cord, B_cords, C_cords)
-    ABN = get_triangle_square_from_three_cords(A_cord, B_cords, cords_to_check)
-    ACN = get_triangle_square_from_three_cords(A_cord, C_cords, cords_to_check)
-    BCN = get_triangle_square_from_three_cords(B_cords, C_cords, cords_to_check)
-
-    triangles_square_sum = (ABN + ACN + BCN)
-    equals = ABC >= triangles_square_sum  # TODO: задать вопрос >= или =
-
-    if equals:
-        pass
-        # print(ABC, ">=" if equals else "<", triangles_square_sum, "=", ABN, "+", ACN, "+", BCN)
-
-    return equals
 
 
 #  triangle build

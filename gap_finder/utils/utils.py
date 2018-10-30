@@ -1,6 +1,7 @@
 __all__ = [
     'find_equation_plane_rates',
-    'get_triangle_square_from_three_cords'
+    'get_triangle_square_from_three_cords',
+    'is_dot_in_triangle'
 ]
 
 
@@ -55,3 +56,31 @@ def find_equation_plane_rates(x1, y1, z1, x2, y2, z2, x3, y3, z3) -> (int, int, 
     # print("equation of plane is ", a, "x +", b, "y +", c, "z +", d, "= 0.")
 
     return a, b, c, d
+
+
+# TODO enum
+def is_dot_in_triangle(cords: list, cords_to_check: tuple) -> bool:
+    """
+    Очень простой способ проверить находится ли точка в треугольнике или нет.
+
+    Проверяется сумма площадей трех треугольников, на которые точка.
+
+    :param cords: (tuple(cord, cord, cord)): три точки
+    :param cords_to_check:
+    :return: (bool) нах
+    """
+
+    A_cord, B_cords, C_cords = cords
+    ABC = get_triangle_square_from_three_cords(A_cord, B_cords, C_cords)
+    ABN = get_triangle_square_from_three_cords(A_cord, B_cords, cords_to_check)
+    ACN = get_triangle_square_from_three_cords(A_cord, C_cords, cords_to_check)
+    BCN = get_triangle_square_from_three_cords(B_cords, C_cords, cords_to_check)
+
+    triangles_square_sum = (ABN + ACN + BCN)
+    equals = ABC >= triangles_square_sum  # TODO: задать вопрос >= или =
+
+    if equals:
+        pass
+        # print(ABC, ">=" if equals else "<", triangles_square_sum, "=", ABN, "+", ACN, "+", BCN)
+
+    return equals
