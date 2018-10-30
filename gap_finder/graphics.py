@@ -3,8 +3,10 @@ import matplotlib.pyplot as plt
 
 def init_graphic():
     """
-    Инициализирует матплотлибу. Возвращает пустой график.
-    :return:
+    Инициализирует матплотлибу. Возвращает объекты axes и plot.
+
+
+    :return: AXES, PLOT
     """
     # нужный импорт для 3D моделирования
     from mpl_toolkits.mplot3d import Axes3D
@@ -20,7 +22,7 @@ def build_surface(axes, x, y, z):
     Строит фигуру в текущем пространстве axes
 
 
-    :param axes: plt.axes(projection='3d'), plt
+    :param axes: plt.axes(projection='3d') - Текущее просторанство
     :param x: numpy array
     :param y: numpy array
     :param z: numpy array
