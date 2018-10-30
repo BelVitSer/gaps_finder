@@ -73,10 +73,11 @@ def get_all_coordinates_triplets(coordinates_array):
     return coordinates
 
 
-def generate_plane_by_three_coordinates(coord_1: Coordinate, coord_2: Coordinate, coord_3: Coordinate):
+def generate_plane_by_three_coordinates(coord_1: Coordinate, coord_2: Coordinate, coord_3: Coordinate, dots_count):
     """
     Построение плоскости по трём координатам
 
+    :param dots_count:
     :param coord_1:
     :param coord_2:
     :param coord_3:
@@ -93,7 +94,7 @@ def generate_plane_by_three_coordinates(coord_1: Coordinate, coord_2: Coordinate
         # print("( -", d, "-", a, "*", "X", "-", b, "*", "Y", ")", "/", c)
         return (-d - a * x_array - b * y_array) / c
 
-    XX, YY = get_x_y_grid(DOTS_COUNT)
+    XX, YY = get_x_y_grid(dots_count)
 
     ZZ = f(XX, YY)
 
@@ -151,24 +152,46 @@ def filter_normal_coords_in_combinations(combinations_cords, normal_cords):
     return no_normal
 
 
+def filter_is_not_stucked_plane(plane_coordinates, surface_z_coord):
+    square_build_cords = []
+
+    for plane_num, cords in enumerate(plane_coordinates):
+
+        x_plane, y_plane, z_plane = generate_plane_by_three_coordinates(*cords, dots_count=DOTS_COUNT)
+
+        was_ok = []
+
+        for index, zn in np.ndenumerate(surface_z_coord):
+            yn, xn = index
+            one_cord_condition = z_plane[yn][xn] <= surface_z_coord[yn][xn]
+            was_ok.append(one_cord_condition)
+
+        if all(was_ok):
+            # print("Find square:")
+            square_build_cords.append(cords)
+
+    return square_build_cords
+
+
 def log_all_stuff(
         all_coordinates,
         all_possible_combinations,
         in_triangle,
         square_build_cords
 ):
-    print(
-        """\nИз сетки {} x {} т.е. {} количества точек получается
-         {} базовых комбинаций 3-х точек.\nПосле поиска трёх точек
-          входящих в треугольник с нормалью: {} комб.\n Точек,
-           удовлетворяющих условий плоскости: {}""".format(
-            DOTS_COUNT,
-            DOTS_COUNT,
-            len(all_coordinates),
-            len(all_possible_combinations),
-            len(in_triangle),
-            len(square_build_cords)
-        ))
+    message = "\nИз сетки {} x {} т.е. {} количества" \
+              " точек получается{} базовых комбинаций 3-х точек." \
+              "\nПосле поиска трёх точек входящих в треугольник" \
+              " с нормалью: {} комб.\n Точек,удовлетворяющих" \
+              " условий плоскости: {}"
+
+    print(message.format(
+        DOTS_COUNT,
+        DOTS_COUNT,
+        len(all_coordinates),
+        len(all_possible_combinations),
+        len(in_triangle),
+        len(square_build_cords)))
 
 
 def main():
@@ -187,22 +210,7 @@ def main():
 
     not_with_normal = filter_in_triangle_combinations(all_possible_combinations, normal_cords)
     in_triangle = filter_normal_coords_in_combinations(not_with_normal, normal_cords)
-
-    square_build_cords = []
-
-    for plane_num, cords in enumerate(in_triangle):
-
-        x_plane, y_plane, z_plane = generate_plane_by_three_coordinates(*cords)
-
-        was_ok = []
-        for index, zn in np.ndenumerate(Z):
-            yn, xn = index
-            one_cord_condition = z_plane[yn][xn] <= Z[yn][xn]
-            was_ok.append(one_cord_condition)
-
-        if all(was_ok):
-            # print("Find square:")
-            square_build_cords.append(cords)
+    square_build_cords = filter_is_not_stucked_plane(in_triangle, Z)
 
     # # TODO: построить вектор нормали
     # X = (0, 1, 1)
@@ -228,7 +236,7 @@ def main():
         print("%s) Три точки: %s %s %s" % (num, cord1, cord2, cord3))
 
         # TODO: показать соединение точек
-        x_plane, y_plane, z_plane = generate_plane_by_three_coordinates(*plane_cords)
+        x_plane, y_plane, z_plane = generate_plane_by_three_coordinates(*plane_cords, dots_count=DOTS_COUNT)
         build_surface(AXES, x_plane, y_plane, z_plane)
         PLOT.show()
 

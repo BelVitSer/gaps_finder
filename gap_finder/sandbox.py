@@ -19,7 +19,7 @@ cord2 = Coordinate(x=0, y=1, z=1)
 cord3 = Coordinate(x=2, y=0, z=0)
 
 cords = [cord1, cord2, cord3]
-x, y, z = generate_plane_by_three_coordinates(*cords)
+x, y, z = generate_plane_by_three_coordinates(*cords,dots_count=DOTS_COUNT)
 
 a = get_all_coordinates_triplets(z)
 
