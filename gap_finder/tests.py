@@ -6,6 +6,7 @@ from gap_finder.generation import (
     build_surface,
     PLOT,
     AXES,
+    DOTS_COUNT
 )
 from gap_finder.utils import (
     get_triangle_square_from_three_cords, is_dot_in_triangle
@@ -37,7 +38,7 @@ class GapFinderTestCase(TestCase):
         self.assertEqual(is_dot_in, False)
 
     def test_plane_generation(self):
-        x, y, z = generate_plane_by_three_coordinates(*self.cords)
+        x, y, z = generate_plane_by_three_coordinates(*self.cords, dots_count=DOTS_COUNT)
         build_surface(AXES, x, y, z)
 
         # TODO: описать в документации
