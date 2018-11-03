@@ -4,14 +4,17 @@ import numpy as np
 
 from gap_finder.coordinate import Coordinate
 from gap_finder.graphics import build_surface, build_main_surface, init_graphic
+from gap_finder.models import get_engine
+from gap_finder.services.surfaces import SurfaceService
+from gap_finder.settings import (
+    DB_SETTINGS,
+    GENERATION_TRIES,
+    DOTS_COUNT,
+    DEVIATION,
+    MU
+)
 from gap_finder.utils import find_equation_plane_rates, is_dot_in_triangle
 
-# config
-GENERATION_TRIES = 100
-DOTS_COUNT = 10
-DEVIATION = 0.2  # ДОПУСК - стандартное отклонение
-MU = 0  # Математической ожидание
-SIGMA = 0.2 / 6  # Сигма, берем 6*сигма как в маш-нии
 AXES, PLOT = init_graphic()
 
 
@@ -208,6 +211,7 @@ def main():
     normal_y = DOTS_COUNT / 2
     normal_cords = Coordinate(x=normal_x, y=normal_y, z=0)
 
+    # TODO: rename
     not_with_normal = filter_in_triangle_combinations(all_possible_combinations, normal_cords)
     in_triangle = filter_normal_coords_in_combinations(not_with_normal, normal_cords)
     square_build_cords = filter_is_not_stucked_plane(in_triangle, Z)
@@ -238,16 +242,33 @@ def main():
         # TODO: показать соединение точек
         x_plane, y_plane, z_plane = generate_plane_by_three_coordinates(*plane_cords, dots_count=DOTS_COUNT)
         build_surface(AXES, x_plane, y_plane, z_plane)
-        PLOT.show()
+        # TODO: отделить граф логику от расчета PLOT.show()
+
+    return {
+        "xyz_grid": (X, Y, Z),
+        "plane_cords": [[cord1, cord2, cord3]
+                        for cord1, cord2, cord3 in square_build_cords],
+    }
 
 
 if __name__ == '__main__':
+    engine = get_engine(**DB_SETTINGS)
+    service = SurfaceService(engine)
+
+    add_to_db = 200
+    at_db_count = 0
     for x in range(GENERATION_TRIES):
+
+        if at_db_count == add_to_db:
+            break
+
         try:
-            print("Попытка генерации поверхности №%s" % str(x + 1))
-            main()
+            print("\n Попытка генерации поверхности №%s" % str(x + 1))
+            surface_info = main()
         except IndexError:
             PLOT.cla()
             continue
         else:
-            break
+            service.insert_new_surface(**surface_info, dots_count=DOTS_COUNT)
+            at_db_count += 1
+            print("Добавлено %s из %s" % (at_db_count, add_to_db))
