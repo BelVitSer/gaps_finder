@@ -1,3 +1,8 @@
+"""
+Скрипт для генерации нормированной поверхности и
+добавления её в базу
+
+"""
 from itertools import combinations
 
 import numpy as np
@@ -21,8 +26,6 @@ AXES, PLOT = init_graphic()
 def get_x_y_grid(dots_count):
     """
     Генерация квадратной X и Y cетки dots_count на dots_count.
-
-
 
     :param dots_count: количество точек
     :return: X, Y , который возвращает np.meshgrid(x, y)
@@ -104,19 +107,6 @@ def generate_plane_by_three_coordinates(coord_1: Coordinate, coord_2: Coordinate
     return XX, YY, ZZ
 
 
-#  triangle build
-# print("In trinagle count = %s" % len(in_triangle))
-#    if in_triangle:
-#        s = in_triangle[2]
-#        print("in_triangle[0]", s)
-#
-#        x = [x for x, y, z in s] + [s[0][0]]
-#        y = [y for x, y, z in s] + [s[0][1]]
-#        z = [4 for x, y, z in s] + [4]
-#
-#        ax.scatter(x, y, z, c='r', s=100)
-#        ax.plot(x, y, z, color='r')
-
 def filter_in_triangle_combinations(combinations_cords, normal_cords):
     """
     Комбинации трёх точек, входящих в треугольник с нормалью
@@ -151,7 +141,6 @@ def filter_normal_coords_in_combinations(combinations_cords, normal_cords):
 
         no_normal.append(coordinates)
 
-    # print(len(no_normal))
     return no_normal
 
 
@@ -170,7 +159,6 @@ def filter_is_not_stucked_plane(plane_coordinates, surface_z_coord):
             was_ok.append(one_cord_condition)
 
         if all(was_ok):
-            # print("Find square:")
             square_build_cords.append(cords)
 
     return square_build_cords
@@ -197,7 +185,7 @@ def log_all_stuff(
         len(square_build_cords)))
 
 
-def main():
+def generate_one_normal_surface_and_plane_for_it():
     X, Y, Z = generate_main_surface()
     build_main_surface(AXES, PLOT, X, Y, Z)
     all_coordinates = get_all_coordinates_triplets(Z)
@@ -251,11 +239,15 @@ def main():
     }
 
 
-if __name__ == '__main__':
+def main(add_to_db=200):
+    """
+    :param add_to_db: сколько поверхностей добавить в базу
+
+    :return:
+    """
     engine = get_engine(**DB_SETTINGS)
     service = SurfaceService(engine)
 
-    add_to_db = 200
     at_db_count = 0
     for x in range(GENERATION_TRIES):
 
@@ -264,7 +256,7 @@ if __name__ == '__main__':
 
         try:
             print("\n Попытка генерации поверхности №%s" % str(x + 1))
-            surface_info = main()
+            surface_info = generate_one_normal_surface_and_plane_for_it()
         except IndexError:
             PLOT.cla()
             continue
@@ -272,3 +264,7 @@ if __name__ == '__main__':
             service.insert_new_surface(**surface_info, dots_count=DOTS_COUNT)
             at_db_count += 1
             print("Добавлено %s из %s" % (at_db_count, add_to_db))
+
+
+if __name__ == '__main__':
+    main()
