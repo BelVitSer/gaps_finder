@@ -26,6 +26,6 @@ class SurfaceService:
 
         self.engine.execute(query)
 
-    def get_surfaces(self):
+    def get_surfaces(self, shift: int = None, limit: int = None):
         query = sa.select([surface])
-        return self.engine.execute(query)
+        return self.engine.execute(query).fetchall()[shift:limit]
