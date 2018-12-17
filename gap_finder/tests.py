@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from gap_finder.coordinate import Coordinate
 from gap_finder.generation import (
-    generate_plane_by_three_coordinates,
+    build_plane_by_three_coordinates,
     build_surface,
     PLOT,
     AXES,
@@ -38,7 +38,7 @@ class GapFinderTestCase(TestCase):
         self.assertEqual(is_dot_in, False)
 
     def test_plane_generation(self):
-        x, y, z = generate_plane_by_three_coordinates(*self.cords, dots_count=DOTS_COUNT)
+        x, y, z = build_plane_by_three_coordinates(*self.cords, dots_count=DOTS_COUNT)
         build_surface(AXES, x, y, z)
 
         # TODO: описать в документации

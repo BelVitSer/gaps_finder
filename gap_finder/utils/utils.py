@@ -1,7 +1,10 @@
+import numpy as np
+
 __all__ = [
     'find_equation_plane_rates',
     'get_triangle_square_from_three_cords',
-    'is_dot_in_triangle'
+    'is_dot_in_triangle',
+    'calculate_mean_and_standard_deviation'
 ]
 
 
@@ -84,3 +87,28 @@ def is_dot_in_triangle(cords: list, cords_to_check: tuple) -> bool:
         # print(ABC, ">=" if equals else "<", triangles_square_sum, "=", ABN, "+", ACN, "+", BCN)
 
     return equals
+
+
+def calculate_mean_and_standard_deviation(array):
+    """
+    Стандартное отклонение на основании несмещённой оценки дисперсии
+    (подправленная выборочная дисперсия[1],
+    в ГОСТ Р 8.736-2011 — «среднее квадратическое отклонение»)
+
+    :return:
+    """
+    mean = np.mean(array, dtype=np.float64)
+
+    div_el_sum = np.sum(
+        [
+            (np.power((element - mean), 2) / (len(array) - 1)) for element in array
+        ],
+        dtype=np.float64
+    )
+    deviation = np.sqrt(div_el_sum)
+
+    return mean, deviation * 1.2
+
+
+if __name__ == '__main__':
+    print(calculate_mean_and_standard_deviation([1, 2, 3, 4, 5]))

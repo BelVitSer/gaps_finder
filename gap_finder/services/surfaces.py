@@ -2,6 +2,10 @@ from gap_finder.models import surface
 import sqlalchemy as sa
 
 
+class SurfaceNotFoundException(Exception):
+    pass
+
+
 class SurfaceService:
     def __init__(self, engine):
         self.engine = engine
@@ -26,6 +30,39 @@ class SurfaceService:
 
         self.engine.execute(query)
 
-    def get_surfaces(self, shift: int = None, limit: int = None):
+    def get_surfaces(self, offset: int = None, limit: int = None):
         query = sa.select([surface])
-        return self.engine.execute(query).fetchall()[shift:limit]
+
+        if offset:
+            query = query.offset(offset)
+
+        if limit:
+            query = query.limit(limit)
+
+        return self.engine.execute(query).fetchall()
+
+    def update_meta(self, surface_id, meta_to_update):
+        query = sa.select(
+            [
+                surface.c.meta,
+                surface.c.id
+            ]
+        ).where(
+            surface.c.id == surface_id
+        )
+
+        result = self.engine.execute(query)
+        meta = result.fetchone()["meta"]
+
+        if meta is None:
+            raise SurfaceNotFoundException
+
+        meta.update(**meta_to_update)
+
+        query = surface.update().where(
+            surface.c.id == surface_id
+        ).values(meta=meta)
+
+        self.engine.execute(query)
+
+        return True

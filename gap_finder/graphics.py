@@ -1,13 +1,12 @@
-import matplotlib.pyplot as plt
-
-
-def init_graphic():
+def init_3d_graphic():
     """
     Инициализирует матплотлибу. Возвращает объекты axes и plot.
 
 
     :return: AXES, PLOT
     """
+    import matplotlib.pyplot as plt
+
     # нужный импорт для 3D моделирования
     from mpl_toolkits.mplot3d import Axes3D
 
@@ -15,6 +14,19 @@ def init_graphic():
     Axes3D
 
     return plt.axes(projection='3d'), plt
+
+
+def init_2d_graphic():
+    """
+    Инициализирует матплотлибу. Возвращает объект plot.
+
+
+    :return: AXES, PLOT
+    """
+    import matplotlib.pyplot as plt
+    plt.close()  # закроет другие открытые графики
+
+    return plt
 
 
 def build_surface(axes, x, y, z):
@@ -37,18 +49,18 @@ def build_surface(axes, x, y, z):
     axes.set_zlabel('z')
 
 
-def build_main_surface(axes, plot, x, y, z):
+def build_main_surface(axes, plot_, x, y, z):
     """
         Графическое построение моделируемой поверхности
 
     :param axes:
-    :param plot:
+    :param plot_:
     :param x:
     :param y:
     :param z:
     :return:
     """
-    plot.figure(1)
+    plot_.figure(1)
     axes.plot_surface(
         x, y, z, rstride=1, cstride=1,
         cmap='viridis',

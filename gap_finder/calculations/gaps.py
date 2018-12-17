@@ -1,13 +1,14 @@
 """
 Расчет зазоров между плоскостью и поверхностью заготовки
 """
-from gap_finder.models import get_engine
-from gap_finder.services.surfaces import SurfaceService
-from gap_finder.settings import DB_SETTINGS
+import numpy as np
+
 from gap_finder.coordinate import Coordinate
 from gap_finder.generation import build_plane_by_three_coordinates
-import numpy as np
+from gap_finder.models import get_engine
 from gap_finder.models import surface
+from gap_finder.services.surfaces import SurfaceService
+from gap_finder.settings import DB_SETTINGS
 
 
 def find_gaps(z_surface, z_plane):
@@ -22,18 +23,18 @@ def find_gaps(z_surface, z_plane):
     return gaps
 
 
-def get_z_of_surface_and_plane(surface: surface):
-    cord1, cord2, cord3 = surface.plane_cords[0]
+def get_z_of_surface_and_plane(surface_: surface):
+    cord1, cord2, cord3 = surface_.plane_cords[0]
     cord1 = Coordinate(*cord1)
     cord2 = Coordinate(*cord2)
     cord3 = Coordinate(*cord3)
 
     _, _, z = build_plane_by_three_coordinates(
         cord1, cord2, cord3,
-        dots_count=surface.dots_count
+        dots_count=surface_.dots_count
     )
 
-    _, _, Z = surface.xyz_grid
+    _, _, Z = surface_.xyz_grid
 
     return Z, z
 
@@ -50,7 +51,9 @@ def main():
 
         service.update_meta(
             surface_.id,
-            meta_to_update={"gaps": gaps}
+            meta_to_update={
+                "gaps": gaps
+            }
         )
 
 

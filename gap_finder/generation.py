@@ -8,7 +8,7 @@ from itertools import combinations
 import numpy as np
 
 from gap_finder.coordinate import Coordinate
-from gap_finder.graphics import build_surface, build_main_surface, init_graphic
+from gap_finder.graphics import build_surface, build_main_surface, init_3d_graphic
 from gap_finder.models import get_engine
 from gap_finder.services.surfaces import SurfaceService
 from gap_finder.settings import (
@@ -20,7 +20,7 @@ from gap_finder.settings import (
 )
 from gap_finder.utils import find_equation_plane_rates, is_dot_in_triangle
 
-AXES, PLOT = init_graphic()
+AXES, PLOT = init_3d_graphic()
 
 
 def get_x_y_grid(dots_count):
@@ -79,7 +79,7 @@ def get_all_coordinates_triplets(coordinates_array):
     return coordinates
 
 
-def generate_plane_by_three_coordinates(coord_1: Coordinate, coord_2: Coordinate, coord_3: Coordinate, dots_count):
+def build_plane_by_three_coordinates(coord_1: Coordinate, coord_2: Coordinate, coord_3: Coordinate, dots_count):
     """
     Построение плоскости по трём координатам
 
@@ -149,7 +149,7 @@ def filter_is_not_stucked_plane(plane_coordinates, surface_z_coord):
 
     for plane_num, cords in enumerate(plane_coordinates):
 
-        x_plane, y_plane, z_plane = generate_plane_by_three_coordinates(*cords, dots_count=DOTS_COUNT)
+        x_plane, y_plane, z_plane = build_plane_by_three_coordinates(*cords, dots_count=DOTS_COUNT)
 
         was_ok = []
 
@@ -228,7 +228,7 @@ def generate_one_normal_surface_and_plane_for_it():
         print("%s) Три точки: %s %s %s" % (num, cord1, cord2, cord3))
 
         # TODO: показать соединение точек
-        x_plane, y_plane, z_plane = generate_plane_by_three_coordinates(*plane_cords, dots_count=DOTS_COUNT)
+        x_plane, y_plane, z_plane = build_plane_by_three_coordinates(*plane_cords, dots_count=DOTS_COUNT)
         build_surface(AXES, x_plane, y_plane, z_plane)
         # TODO: отделить граф логику от расчета PLOT.show()
 
